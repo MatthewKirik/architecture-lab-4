@@ -11,6 +11,8 @@ type commandsQueue struct {
 }
 
 func (queue *commandsQueue) isEmpty() bool {
+	queue.locker.Lock()
+	defer queue.locker.Unlock()
 	return len(queue.commands) == 0
 }
 
@@ -29,7 +31,7 @@ func (queue *commandsQueue) pull() Command {
 	cmd := queue.commands[0]
 	queue.commands[0] = nil
 	queue.commands = queue.commands[1:]
-	if !queue.isEmpty() {
+	if len(queue.commands) > 0 {
 		queue.emptyLocker.Unlock()
 	}
 	return cmd
