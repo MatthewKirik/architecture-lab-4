@@ -16,9 +16,9 @@ func (queue *commandsQueue) isEmpty() bool {
 
 func (queue *commandsQueue) push(cmd Command) {
 	queue.locker.Lock()
-	defer queue.locker.Unlock()
 	wasEmpty := queue.isEmpty()
 	queue.commands = append(queue.commands, cmd)
+	queue.locker.Unlock()
 	if wasEmpty {
 		queue.hasElements <- struct{}{}
 	}

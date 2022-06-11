@@ -1,14 +1,18 @@
 package engine
 
-import "fmt"
+import (
+	"sync"
+)
 
 type EventLoop struct {
 	commands *commandsQueue
+	locker   sync.Mutex
 }
 
 func (loop *EventLoop) Start() {
-	fmt.Print("I am loop start")
-	loop.commands = new(commandsQueue)
+	loop.commands = &commandsQueue{
+		hasElements: make(chan struct{}),
+	}
 	go loop.listen()
 }
 
@@ -20,9 +24,7 @@ func (loop *EventLoop) listen() {
 }
 
 func (loop *EventLoop) Post(cmd Command) {
-	fmt.Print("I am loop post")
 }
 
 func (loop *EventLoop) AwaitFinish() {
-	fmt.Print("I am loop finish")
 }
