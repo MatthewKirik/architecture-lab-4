@@ -10,28 +10,30 @@ type commandsQueue struct {
 	hasElements chan struct{}
 }
 
+func newCommandsQueue() *commandsQueue {
+	return &commandsQueue{
+		hasElements: make(chan struct{}, 1),
+	}
+}
+
 func (queue *commandsQueue) isEmpty() bool {
 	return len(queue.commands) == 0
 }
 
 func (queue *commandsQueue) push(cmd Command) {
 	queue.locker.Lock()
-	wasEmpty := queue.isEmpty()
 	queue.commands = append(queue.commands, cmd)
 	queue.locker.Unlock()
-	if wasEmpty {
+
+	if len(queue.hasElements) == 0 {
 		queue.hasElements <- struct{}{}
 	}
 }
 
 func (queue *commandsQueue) pull() Command {
+	<-queue.hasElements
 	queue.locker.Lock()
 	defer queue.locker.Unlock()
-	if queue.isEmpty() {
-		queue.locker.Unlock()
-		<-queue.hasElements
-		queue.locker.Lock()
-	}
 	cmd := queue.commands[0]
 	queue.commands[0] = nil
 	queue.commands = queue.commands[1:]
