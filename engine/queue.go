@@ -7,13 +7,11 @@ import (
 type commandsQueue struct {
 	commands    []Command
 	locker      sync.Mutex
-	hasElements chan struct{}
+	emptyLocker sync.Mutex
 }
 
 func newCommandsQueue() *commandsQueue {
-	return &commandsQueue{
-		hasElements: make(chan struct{}, 1),
-	}
+	return new(commandsQueue)
 }
 
 func (queue *commandsQueue) isEmpty() bool {
@@ -24,18 +22,19 @@ func (queue *commandsQueue) push(cmd Command) {
 	queue.locker.Lock()
 	queue.commands = append(queue.commands, cmd)
 	queue.locker.Unlock()
-
-	if len(queue.hasElements) == 0 {
-		queue.hasElements <- struct{}{}
-	}
+	queue.emptyLocker.TryLock()
+	queue.emptyLocker.Unlock()
 }
 
 func (queue *commandsQueue) pull() Command {
-	<-queue.hasElements
+	queue.emptyLocker.Lock()
 	queue.locker.Lock()
 	defer queue.locker.Unlock()
 	cmd := queue.commands[0]
 	queue.commands[0] = nil
 	queue.commands = queue.commands[1:]
+	if !queue.isEmpty() {
+		queue.emptyLocker.Unlock()
+	}
 	return cmd
 }
