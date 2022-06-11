@@ -25,7 +25,12 @@ func (loop *EventLoop) listen() {
 }
 
 func (loop *EventLoop) Post(cmd Command) {
+	if loop.stopRequested {
+		return
+	}
+	loop.commands.push(cmd)
 }
 
 func (loop *EventLoop) AwaitFinish() {
+	loop.stopRequested = true
 }
