@@ -5,8 +5,9 @@ import (
 )
 
 type EventLoop struct {
-	commands *commandsQueue
-	locker   sync.Mutex
+	commands      *commandsQueue
+	locker        sync.Mutex
+	stopRequested bool
 }
 
 func (loop *EventLoop) Start() {
@@ -17,7 +18,7 @@ func (loop *EventLoop) Start() {
 }
 
 func (loop *EventLoop) listen() {
-	for !loop.commands.isEmpty() {
+	for !loop.stopRequested || !loop.commands.isEmpty() {
 		cmd := loop.commands.pull()
 		cmd.Execute(loop)
 	}
