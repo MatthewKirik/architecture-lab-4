@@ -1,5 +1,7 @@
 package engine
 
+import "sync"
+
 type EventLoop struct {
 	commands      *commandsQueue
 	stopRequested bool
@@ -7,7 +9,10 @@ type EventLoop struct {
 }
 
 func (loop *EventLoop) Start() {
-	loop.commands = new(commandsQueue)
+	loop.commands = &commandsQueue{
+		cond: *sync.NewCond(&sync.Mutex{}),
+	}
+	loop.stopped = make(chan struct{})
 	go loop.listen()
 }
 

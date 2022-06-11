@@ -5,34 +5,31 @@ import (
 )
 
 type commandsQueue struct {
-	commands    []Command
-	locker      sync.Mutex
-	emptyLocker sync.Mutex
+	commands []Command
+	cond     sync.Cond
 }
 
 func (queue *commandsQueue) isEmpty() bool {
-	queue.locker.Lock()
-	defer queue.locker.Unlock()
+	queue.cond.L.Lock()
+	defer queue.cond.L.Unlock()
 	return len(queue.commands) == 0
 }
 
 func (queue *commandsQueue) push(cmd Command) {
-	queue.locker.Lock()
+	queue.cond.L.Lock()
 	queue.commands = append(queue.commands, cmd)
-	queue.locker.Unlock()
-	queue.emptyLocker.TryLock()
-	queue.emptyLocker.Unlock()
+	queue.cond.L.Unlock()
+	queue.cond.Broadcast()
 }
 
 func (queue *commandsQueue) pull() Command {
-	queue.emptyLocker.Lock()
-	queue.locker.Lock()
-	defer queue.locker.Unlock()
+	for len(queue.commands) == 0 {
+		queue.cond.Wait()
+	}
+	queue.cond.L.Lock()
+	defer queue.cond.L.Unlock()
 	cmd := queue.commands[0]
 	queue.commands[0] = nil
 	queue.commands = queue.commands[1:]
-	if len(queue.commands) > 0 {
-		queue.emptyLocker.Unlock()
-	}
 	return cmd
 }
