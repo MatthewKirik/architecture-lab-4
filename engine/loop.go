@@ -1,13 +1,9 @@
 package engine
 
-import (
-	"sync"
-)
-
 type EventLoop struct {
 	commands      *commandsQueue
-	locker        sync.Mutex
 	stopRequested bool
+	stopped       chan struct{}
 }
 
 func (loop *EventLoop) Start() {
@@ -20,6 +16,7 @@ func (loop *EventLoop) listen() {
 		cmd := loop.commands.pull()
 		cmd.Execute(loop)
 	}
+	loop.stopped <- struct{}{}
 }
 
 func (loop *EventLoop) Post(cmd Command) {
@@ -30,5 +27,8 @@ func (loop *EventLoop) Post(cmd Command) {
 }
 
 func (loop *EventLoop) AwaitFinish() {
-	loop.stopRequested = true
+	loop.Post(FuncCommand(func(handler Handler) {
+		loop.stopRequested = true
+	}))
+	<-loop.stopped
 }
