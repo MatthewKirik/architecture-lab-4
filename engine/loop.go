@@ -11,9 +11,7 @@ type EventLoop struct {
 }
 
 func (loop *EventLoop) Start() {
-	loop.commands = &commandsQueue{
-		hasElements: make(chan struct{}),
-	}
+	loop.commands = newCommandsQueue()
 	go loop.listen()
 }
 
