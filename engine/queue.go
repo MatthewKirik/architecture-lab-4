@@ -10,10 +10,6 @@ type commandsQueue struct {
 	emptyLocker sync.Mutex
 }
 
-func newCommandsQueue() *commandsQueue {
-	return new(commandsQueue)
-}
-
 func (queue *commandsQueue) isEmpty() bool {
 	return len(queue.commands) == 0
 }

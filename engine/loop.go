@@ -11,7 +11,7 @@ type EventLoop struct {
 }
 
 func (loop *EventLoop) Start() {
-	loop.commands = newCommandsQueue()
+	loop.commands = new(commandsQueue)
 	go loop.listen()
 }
 
