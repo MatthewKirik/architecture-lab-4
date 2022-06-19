@@ -20,35 +20,22 @@ func processPrintCmd(args []string) (engine.Command, error) {
 }
 
 func processSplitCmd(args []string) (engine.Command, error) {
-	// TODO: implements
+	if len(args) != 2 {
+		return nil, fmt.Errorf("Wrong number of arguments."+
+			"Expected 2, got %d instead", len(args))
+	}
 
-	return nil, nil
+	if len(args[1]) != 1 {
+		return nil, fmt.Errorf("Separator's length should be 1 character long")
+	}
+
+	return &splitCmd{args[0], args[1]}, nil
 }
 
 var commandsArr = map[string]cmdProcessor{
 	"print": processPrintCmd,
 	"split": processSplitCmd,
 }
-
-// var commandsArr = []string{
-// 	"split",
-// 	"print",
-// }
-
-/*
-{
-	args: 2 int
-	command: "print" string
-	type: &printCommand ???
-}
-
-*/
-
-// JS:
-// const commandsArr = {
-//	split: "split",
-//	print: "print",
-// }
 
 func findCommand(commandStr string) (cmdProcessor, error) {
 	for cmd, fn := range commandsArr {
@@ -78,20 +65,3 @@ func parse(text string) engine.Command {
 
 	return command
 }
-
-// func handleSplit(split *[]string) error {
-// 	if len(*split) != 3 {
-// 		return fmt.Errorf("Wrong count of arguments, expected 3  - got: %d", len(*split))
-// 	}
-// 	if len((*split)[2]) != 1 {
-// 		return errors.New("Separator should be 1 character long!")
-// 	}
-// 	return nil
-// }
-
-// func handlePrint(split *[]string) error {
-// 	if len(*split) != 2 {
-// 		return fmt.Errorf("Wrong count of arguments, expected 2  - got: %d", len(*split))
-// 	}
-// 	return nil
-// }
