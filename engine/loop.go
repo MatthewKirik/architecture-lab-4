@@ -12,7 +12,7 @@ type EventLoop struct {
 
 func (loop *EventLoop) Start() {
 	loop.commands = &commandsQueue{
-		cond: *sync.NewCond(&sync.Mutex{}),
+		hasElements: *sync.NewCond(&sync.Mutex{}),
 	}
 	loop.stopCond = *sync.NewCond(&sync.Mutex{})
 	go loop.listen()
