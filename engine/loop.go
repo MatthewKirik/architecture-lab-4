@@ -3,11 +3,12 @@ package engine
 import "sync"
 
 type EventLoop struct {
-	commands      *commandsQueue
+	commands *commandsQueue
+	stopCond sync.Cond
+
+	stopLocker    sync.Mutex
 	stopRequested bool
 	stopped       bool
-	stopLocker    sync.Mutex
-	stopCond      sync.Cond
 }
 
 func (loop *EventLoop) Start() {
