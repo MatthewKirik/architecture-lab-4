@@ -21,7 +21,7 @@ func processPrintCmd(args []string) (engine.Command, error) {
 
 func processSplitCmd(args []string) (engine.Command, error) {
 	if len(args) != 2 {
-		return nil, fmt.Errorf("Wrong number of arguments."+
+		return nil, fmt.Errorf("SYNTAX ERROR: Wrong number of arguments."+
 			"Expected 2, got %d instead", len(args))
 	}
 
@@ -49,17 +49,18 @@ func findCommand(commandStr string) (cmdProcessor, error) {
 
 func parse(text string) engine.Command {
 	values := strings.Split(text, " ")
+	errPrefix := "SYNTAX ERROR: "
 	cmdFunc, err := findCommand(values[0])
 	if err != nil {
 		return &printCommand{
-			text: err.Error(),
+			text: errPrefix + err.Error(),
 		}
 	}
 
 	command, err := cmdFunc(values[1:])
 	if err != nil {
 		return &printCommand{
-			text: err.Error(),
+			text: errPrefix + err.Error(),
 		}
 	}
 
