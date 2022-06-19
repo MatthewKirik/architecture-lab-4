@@ -2,20 +2,38 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/MatthewKirik/architecture-lab-4/engine"
 )
 
-// var commandsArr = map[string]int{
-// 	"split": 3,
-// 	"print": 2,
-// }
+type cmdProcessor func(args []string) (engine.Command, error)
 
-var commandsArr = []string{
-	"split",
-	"print",
+func processPrintCmd(args []string) (engine.Command, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("Wrong number of arguments."+
+			"Expected 1, got %d instead", len(args))
+	}
+
+	return &printCommand{args[0]}, nil
 }
+
+func processSplitCmd(args []string) (engine.Command, error) {
+	// TODO: implements
+
+	return nil, nil
+}
+
+var commandsArr = map[string]cmdProcessor{
+	"print": processPrintCmd,
+	"split": processSplitCmd,
+}
+
+// var commandsArr = []string{
+// 	"split",
+// 	"print",
+// }
 
 /*
 {
@@ -32,37 +50,26 @@ var commandsArr = []string{
 //	print: "print",
 // }
 
-func findCommand(command string) (string, error) {
-	for _, cmd := range commandsArr {
-		if cmd == command {
-			return cmd, nil
+func findCommand(commandStr string) (cmdProcessor, error) {
+	for cmd, fn := range commandsArr {
+		if cmd == commandStr {
+			return fn, nil
 		}
 	}
 
-	return "", errors.New("unknown command")
-}
-
-func buildCommand(cmdStr string, args []string) (engine.Command, error) {
-	// TODO: implements
-	switch cmdStr {
-	case "split":
-		// ddd
-		break
-	case "print":
-	}
-	return nil, nil
+	return nil, errors.New("unknown command")
 }
 
 func parse(text string) engine.Command {
-	split := strings.Split(text, " ")
-	cmdStr, err := findCommand(split[0])
+	values := strings.Split(text, " ")
+	cmdFunc, err := findCommand(values[0])
 	if err != nil {
 		return &printCommand{
 			text: err.Error(),
 		}
 	}
 
-	command, err := buildCommand(cmdStr, split[0:])
+	command, err := cmdFunc(values[1:])
 	if err != nil {
 		return &printCommand{
 			text: err.Error(),
@@ -70,15 +77,6 @@ func parse(text string) engine.Command {
 	}
 
 	return command
-
-	// if split[0] == "split" {
-	// 	handleSplit(&split)
-	// 	return &splitCmd{split[1], split[2]}
-	// }
-	// if split[0] == "print" {
-	// 	handlePrint(&split)
-	// 	return &printCommand{split[1]}
-	// }
 }
 
 // func handleSplit(split *[]string) error {
