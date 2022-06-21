@@ -1,12 +1,16 @@
 package engine
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/MatthewKirik/architecture-lab-4/command"
+)
 
 type trustedHandler struct {
 	loop *EventLoop
 }
 
-func (th *trustedHandler) Post(cmd Command) {
+func (th *trustedHandler) Post(cmd command.Command) {
 	th.loop.commands.push(cmd)
 }
 
@@ -30,13 +34,16 @@ func (loop *EventLoop) init() {
 }
 
 func (loop *EventLoop) dispose() {
-	loop.stopLocker.Lock()
 	loop.commands = nil
-	loop.stopCond = sync.Cond{}
-	loop.stopLocker = sync.Mutex{}
-	loop.stopRequested = false
+}
+
+func (loop *EventLoop) stop() {
+	loop.stopLocker.Lock()
 	loop.stopped = true
+	loop.stopRequested = false
 	loop.stopLocker.Unlock()
+	loop.stopCond.Broadcast()
+	loop.dispose()
 }
 
 func (loop *EventLoop) listen() {
@@ -44,8 +51,7 @@ func (loop *EventLoop) listen() {
 		cmd := loop.commands.pull()
 		cmd.Execute(&trustedHandler{loop})
 	}
-	loop.dispose()
-	loop.stopCond.Broadcast()
+	loop.stop()
 }
 
 func (loop *EventLoop) Start() {
@@ -65,7 +71,7 @@ func (loop *EventLoop) isStopped() bool {
 	return loop.stopped
 }
 
-func (loop *EventLoop) Post(cmd Command) {
+func (loop *EventLoop) Post(cmd command.Command) {
 	if loop.isStopRequested() || loop.isStopped() {
 		return
 	}
