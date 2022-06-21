@@ -34,13 +34,16 @@ func (loop *EventLoop) init() {
 }
 
 func (loop *EventLoop) dispose() {
-	loop.stopLocker.Lock()
 	loop.commands = nil
-	loop.stopCond = sync.Cond{}
-	loop.stopLocker = sync.Mutex{}
-	loop.stopRequested = false
+}
+
+func (loop *EventLoop) stop() {
+	loop.stopLocker.Lock()
 	loop.stopped = true
+	loop.stopRequested = false
 	loop.stopLocker.Unlock()
+	loop.stopCond.Broadcast()
+	loop.dispose()
 }
 
 func (loop *EventLoop) listen() {
@@ -48,8 +51,7 @@ func (loop *EventLoop) listen() {
 		cmd := loop.commands.pull()
 		cmd.Execute(&trustedHandler{loop})
 	}
-	loop.dispose()
-	loop.stopCond.Broadcast()
+	loop.stop()
 }
 
 func (loop *EventLoop) Start() {
