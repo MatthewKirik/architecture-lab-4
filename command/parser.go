@@ -30,13 +30,13 @@ func processSplitCmd(args []string) (Command, error) {
 	return &SplitCmd{args[0], args[1]}, nil
 }
 
-var commandsArr = map[string]cmdProcessor{
+var commandsMap = map[string]cmdProcessor{
 	"print": processPrintCmd,
 	"split": processSplitCmd,
 }
 
 func findCommand(commandStr string) (cmdProcessor, error) {
-	for cmd, fn := range commandsArr {
+	for cmd, fn := range commandsMap {
 		if cmd == commandStr {
 			return fn, nil
 		}
