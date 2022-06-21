@@ -24,14 +24,19 @@ func (loop *EventLoop) init() {
 		hasElements: *sync.NewCond(&sync.Mutex{}),
 	}
 	loop.stopCond = *sync.NewCond(&sync.Mutex{})
+	loop.stopLocker = sync.Mutex{}
+	loop.stopRequested = false
+	loop.stopped = false
 }
 
 func (loop *EventLoop) dispose() {
+	loop.stopLocker.Lock()
 	loop.commands = nil
 	loop.stopCond = sync.Cond{}
 	loop.stopLocker = sync.Mutex{}
 	loop.stopRequested = false
-	loop.stopped = false
+	loop.stopped = true
+	loop.stopLocker.Unlock()
 }
 
 func (loop *EventLoop) listen() {
@@ -39,9 +44,7 @@ func (loop *EventLoop) listen() {
 		cmd := loop.commands.pull()
 		cmd.Execute(&trustedHandler{loop})
 	}
-	loop.stopLocker.Lock()
-	loop.stopped = true
-	loop.stopLocker.Unlock()
+	loop.dispose()
 	loop.stopCond.Broadcast()
 }
 
@@ -80,5 +83,4 @@ func (loop *EventLoop) AwaitFinish() {
 	}
 	loop.stopCond.L.Lock()
 	loop.stopCond.Wait()
-	loop.dispose()
 }
