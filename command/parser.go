@@ -1,7 +1,6 @@
 package command
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -10,7 +9,7 @@ type cmdProcessor func(args []string) (Command, error)
 
 func processPrintCmd(args []string) (Command, error) {
 	if len(args) != 1 {
-		return nil, fmt.Errorf("Wrong number of arguments."+
+		return nil, fmt.Errorf("wrong number of arguments."+
 			"Expected 1, got %d instead", len(args))
 	}
 
@@ -24,7 +23,7 @@ func processSplitCmd(args []string) (Command, error) {
 	}
 
 	if len(args[1]) != 1 {
-		return nil, fmt.Errorf("Separator's length should be 1 character long")
+		return nil, fmt.Errorf("separator's length should be 1 character long")
 	}
 
 	return &SplitCmd{args[0], args[1]}, nil
@@ -42,7 +41,7 @@ func findCommand(commandStr string) (cmdProcessor, error) {
 		}
 	}
 
-	return nil, errors.New("unknown command")
+	return nil, fmt.Errorf("unknown command")
 }
 
 func Parse(text string) Command {
