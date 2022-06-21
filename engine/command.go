@@ -4,8 +4,8 @@ type Command interface {
 	Execute(handler Handler)
 }
 
-type FuncCommand func()
+// type FuncCommand func()
 
-func (fCmd FuncCommand) Execute(handler Handler) {
-	fCmd()
-}
+// func (fCmd FuncCommand) Execute(handler Handler) {
+// 	fCmd()
+// }
