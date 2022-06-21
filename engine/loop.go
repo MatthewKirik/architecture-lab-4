@@ -1,12 +1,16 @@
 package engine
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/MatthewKirik/architecture-lab-4/command"
+)
 
 type trustedHandler struct {
 	loop *EventLoop
 }
 
-func (th *trustedHandler) Post(cmd Command) {
+func (th *trustedHandler) Post(cmd command.Command) {
 	th.loop.commands.push(cmd)
 }
 
@@ -65,7 +69,7 @@ func (loop *EventLoop) isStopped() bool {
 	return loop.stopped
 }
 
-func (loop *EventLoop) Post(cmd Command) {
+func (loop *EventLoop) Post(cmd command.Command) {
 	if loop.isStopRequested() || loop.isStopped() {
 		return
 	}

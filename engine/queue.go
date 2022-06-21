@@ -2,10 +2,12 @@ package engine
 
 import (
 	"sync"
+
+	"github.com/MatthewKirik/architecture-lab-4/command"
 )
 
 type commandsQueue struct {
-	commands    []Command
+	commands    []command.Command
 	hasElements sync.Cond
 }
 
@@ -15,14 +17,14 @@ func (queue *commandsQueue) isEmpty() bool {
 	return len(queue.commands) == 0
 }
 
-func (queue *commandsQueue) push(cmd Command) {
+func (queue *commandsQueue) push(cmd command.Command) {
 	queue.hasElements.L.Lock()
 	queue.commands = append(queue.commands, cmd)
 	queue.hasElements.L.Unlock()
 	queue.hasElements.Broadcast()
 }
 
-func (queue *commandsQueue) pull() Command {
+func (queue *commandsQueue) pull() command.Command {
 	queue.hasElements.L.Lock()
 	for len(queue.commands) == 0 {
 		queue.hasElements.Wait()
