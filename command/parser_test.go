@@ -49,3 +49,15 @@ func TestErrorUnknownCommand(t *testing.T) {
 	assert := assert.New(t)
 	assert.Equal("", "")
 }
+
+func ExampleParse() {
+	inputPrint := "print your-string-here"
+	inputSplit := "split"
+
+	cmdPrint := Parse(inputPrint)
+	cmdSplit := Parse(inputSplit)
+
+	var handler Handler
+	handler.Post(cmdPrint)
+	handler.Post(cmdSplit)
+}
