@@ -18,7 +18,7 @@ func processPrintCmd(args []string) (Command, error) {
 
 func processSplitCmd(args []string) (Command, error) {
 	if len(args) != 2 {
-		return nil, fmt.Errorf("SYNTAX ERROR: Wrong number of arguments."+
+		return nil, fmt.Errorf("wrong number of arguments."+
 			"Expected 2, got %d instead", len(args))
 	}
 
