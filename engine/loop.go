@@ -21,6 +21,7 @@ type EventLoop struct {
 	stopLocker    sync.Mutex
 	stopRequested bool
 	stopped       bool
+	isRunning     bool
 }
 
 func (loop *EventLoop) init() {
@@ -29,6 +30,7 @@ func (loop *EventLoop) init() {
 	}
 	loop.stopCond = *sync.NewCond(&sync.Mutex{})
 	loop.stopLocker = sync.Mutex{}
+	loop.isRunning = true
 	loop.stopRequested = false
 	loop.stopped = false
 }
@@ -41,6 +43,7 @@ func (loop *EventLoop) stop() {
 	loop.stopLocker.Lock()
 	loop.stopped = true
 	loop.stopRequested = false
+	loop.isRunning = false
 	loop.stopLocker.Unlock()
 	loop.stopCond.Broadcast()
 	loop.dispose()
@@ -52,6 +55,12 @@ func (loop *EventLoop) listen() {
 		cmd.Execute(&trustedHandler{loop})
 	}
 	loop.stop()
+}
+
+func (loop *EventLoop) verifyRunning() {
+	if !loop.isRunning {
+		panic("Unable to perform an action. Loop was not started")
+	}
 }
 
 func (loop *EventLoop) Start() {
@@ -72,6 +81,7 @@ func (loop *EventLoop) isStopped() bool {
 }
 
 func (loop *EventLoop) Post(cmd command.Command) {
+	loop.verifyRunning()
 	if loop.isStopRequested() || loop.isStopped() {
 		return
 	}
@@ -79,6 +89,7 @@ func (loop *EventLoop) Post(cmd command.Command) {
 }
 
 func (loop *EventLoop) AwaitFinish() {
+	loop.verifyRunning()
 	if loop.isStopped() {
 		return
 	}
