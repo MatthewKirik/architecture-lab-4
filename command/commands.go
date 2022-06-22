@@ -20,7 +20,6 @@ type SplitCmd struct {
 
 func (sc *SplitCmd) Execute(handler Handler) {
 	parts := strings.Split(sc.Text, sc.Separator)
-	for _, part := range parts {
-		handler.Post(&PrintCmd{Text: part})
-	}
+	resultStr := strings.Join(parts, "\n")
+	handler.Post(&PrintCmd{Text: resultStr})
 }
