@@ -103,6 +103,21 @@ func TestStopEmptyLoop(t *testing.T) {
 	loop.AwaitFinish()
 }
 
+func TestMultipleAwaits(t *testing.T) {
+	loop := new(EventLoop)
+	loop.Start()
+	loop.Post(&command.PrintCmd{Text: "something here! ?@ s ddd!"})
+	loop.Post(&command.PrintCmd{Text: "Who are you?!"})
+	loop.Post(&command.SplitCmd{
+		Text:      "How do u like it?",
+		Separator: " ",
+	})
+	go loop.AwaitFinish()
+	go loop.AwaitFinish()
+	go loop.AwaitFinish()
+	loop.AwaitFinish()
+}
+
 func ExampleEventLoop() {
 	loop := new(EventLoop)
 	loop.Start()
