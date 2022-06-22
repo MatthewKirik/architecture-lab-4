@@ -118,6 +118,19 @@ func TestMultipleAwaits(t *testing.T) {
 	loop.AwaitFinish()
 }
 
+func TestPostCommandAfterLoopWasStopped(t *testing.T) {
+	loop := new(EventLoop)
+	loop.Start()
+	loop.Post(&command.PrintCmd{Text: "Yeah I am going forward into event loop :)"})
+	loop.AwaitFinish()
+	loop.Post(&command.PrintCmd{Text: "Oh no, I will be executed in stopped loop!"})
+	loop.Post(&command.PrintCmd{Text: "Me too, bro :("})
+	loop.Post(&command.SplitCmd{
+		Text:      "Yall stupid go home!",
+		Separator: " ",
+	})
+}
+
 func ExampleEventLoop() {
 	loop := new(EventLoop)
 	loop.Start()
