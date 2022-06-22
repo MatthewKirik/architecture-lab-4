@@ -1,0 +1,7 @@
+print hello world
+split abc sss
+split 1,2,3,4,5 ,
+print Hello-guys
+print something
+split aaa:bbb:ccc:ddd :
+split program!!in!!go !!
