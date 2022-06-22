@@ -89,4 +89,5 @@ func (loop *EventLoop) AwaitFinish() {
 	}
 	loop.stopCond.L.Lock()
 	loop.stopCond.Wait()
+	loop.stopCond.L.Unlock()
 }
