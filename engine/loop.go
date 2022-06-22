@@ -21,7 +21,7 @@ type EventLoop struct {
 	stopLocker    sync.Mutex
 	stopRequested bool
 	stopped       bool
-	isRunning     bool
+	wasStarted    bool
 }
 
 func (loop *EventLoop) init() {
@@ -30,7 +30,7 @@ func (loop *EventLoop) init() {
 	}
 	loop.stopCond = *sync.NewCond(&sync.Mutex{})
 	loop.stopLocker = sync.Mutex{}
-	loop.isRunning = true
+	loop.wasStarted = true
 	loop.stopRequested = false
 	loop.stopped = false
 }
@@ -43,7 +43,7 @@ func (loop *EventLoop) stop() {
 	loop.stopLocker.Lock()
 	loop.stopped = true
 	loop.stopRequested = false
-	loop.isRunning = false
+	loop.wasStarted = true // it means loop was started at once
 	loop.stopLocker.Unlock()
 	loop.stopCond.Broadcast()
 	loop.dispose()
@@ -58,7 +58,7 @@ func (loop *EventLoop) listen() {
 }
 
 func (loop *EventLoop) verifyRunning() {
-	if !loop.isRunning {
+	if !loop.wasStarted && !loop.stopped {
 		panic("Unable to perform an action. Loop was not started")
 	}
 }
