@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// var testsPath = "../tests/parser-tests.txt"
+var errPrefix = "SYNTAX ERROR:"
 
 func TestParsePrintCmd(t *testing.T) {
 	assert := assert.New(t)
@@ -32,22 +32,39 @@ func TestParseSplitCmd(t *testing.T) {
 
 func TestErrorSplitCmdLongSeparator(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal("", "")
+	inputStr := "split error:::String :::"
+
+	cmd := Parse(inputStr)
+
+	assert.Contains(cmd.(*PrintCmd).Text, errPrefix)
 }
 
 func TestErrorSplitCmdCountArgs(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal("", "")
+	inputStr := "split too many arguments"
+
+	cmd := Parse(inputStr)
+
+	assert.Contains(cmd.(*PrintCmd).Text, errPrefix)
 }
 
 func TestErrorPrintCmdCountArgs(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal("", "")
+	inputStr := "print too many arguments"
+
+	cmd := Parse(inputStr)
+
+	assert.Contains(cmd.(*PrintCmd).Text, errPrefix)
 }
 
 func TestErrorUnknownCommand(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal("", "")
+	inputStr := "perkele 1337"
+	// errPrefix := "SYNTAX ERROR:"
+
+	cmd := Parse(inputStr)
+
+	assert.Contains(cmd.(*PrintCmd).Text, errPrefix)
 }
 
 func ExampleParse() {
