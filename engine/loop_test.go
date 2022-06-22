@@ -10,22 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func captureStdoutString() string {
-// 	old := os.Stdout
-// 	r, w, _ := os.Pipe()
-// 	os.Stdout = w
-
-// 	// fmt.Println("ABOBA!!!")
-
-// 	w.Close()
-// 	os.Stdout = old
-// 	// fmt.Println("ABOBA!!!")
-
-// 	var buf bytes.Buffer
-// 	io.Copy(&buf, r)
-// 	return buf.String()
-// }
-
 func captureStdoutString() func() (string, error) {
 	r, w, err := os.Pipe()
 	if err != nil {
