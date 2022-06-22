@@ -97,6 +97,12 @@ func TestExecutionSplitCommand(t *testing.T) {
 	assert.Equal(capturedOutput, expected)
 }
 
+func TestStopEmptyLoop(t *testing.T) {
+	loop := new(EventLoop)
+	loop.Start()
+	loop.AwaitFinish()
+}
+
 func ExampleEventLoop() {
 	loop := new(EventLoop)
 	loop.Start()
