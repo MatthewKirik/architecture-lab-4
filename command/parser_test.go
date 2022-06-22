@@ -60,7 +60,6 @@ func TestErrorPrintCmdCountArgs(t *testing.T) {
 func TestErrorUnknownCommand(t *testing.T) {
 	assert := assert.New(t)
 	inputStr := "perkele 1337"
-	// errPrefix := "SYNTAX ERROR:"
 
 	cmd := Parse(inputStr)
 
